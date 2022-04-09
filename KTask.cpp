@@ -28,7 +28,7 @@ vector <string> list_files(string dir)
     return result;
 }
 
-Cord split(string data, int num, string file_debug = "")
+Cord split(string data, string file_debug = "")
 {
     auto pos = data.find(" ");
     int transp;
@@ -45,40 +45,19 @@ int main()
     fout.open("result.txt");
     for (string x : data)
     {
-        int counter = 0;
-        vector <item> items;
+        vector <Cord> cords;
         ifstream file("data/" + x);
         getline(file, buf);
-        item start_data = split(buf, 0, x);
-        double capacity = start_data.w;
-        vector <short int> result(start_data.v, 0);
+        double result = -1;
         while (getline(file, buf))
         {
             if (buf == "") continue;
-            auto bufer = split(buf, counter, x);
-            ++counter;
-            if (bufer.w * bufer.v == 0) continue;
-            items.push_back(bufer);
+            cords.push_back(split(buf, x));
         }
         file.close();
-        sort(items.begin(), items.end(), [](item a, item b)
-            {return ((double)a.v / a.w > (double)b.v / b.w) or (((double)a.v / a.w == (double)b.v / b.w) and (a.w < b.w)); });
-        int weight = 0;
-        int cost = 0;
-        for (const auto obj : items)
-            if (weight >= capacity) break;
-            else
-                if (obj.w <= capacity - weight)
-                {
-                    weight += obj.w;
-                    cost += obj.v;
-                    result[obj.num] = 1;
-                }
-        fout << x << ":" << cost << endl;
-        //fout << cost << " " << capacity - weight << endl;
-        //for (auto obj : result)
-        //    fout << obj << " ";
-        //fout << endl;        
+
+
+        fout << x << ":" << result << endl;      
     }
     fout.close();
 }
