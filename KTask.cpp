@@ -7,10 +7,18 @@ using namespace std;
 
 class Cord
 {
-    
-    Cord
+private:
+    double x, y;
+public:    
+    Cord(double a, double b) : x(a), y(b)
+    {}
+    friend double dist(Cord a, Cord b);
 };
 
+double dist(Cord a, Cord b)
+{
+    return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
+}
 
 vector <string> list_files(string dir)
 {
@@ -20,13 +28,13 @@ vector <string> list_files(string dir)
     return result;
 }
 
-item split(string data, int num, string file_debug = "")
+Cord split(string data, int num, string file_debug = "")
 {
     auto pos = data.find(" ");
     int transp;
     if (data.find("  ") != string::npos) transp = 2;
     else transp = 1;
-    return item(stoi(data.substr(0, pos)), stoi(data.substr(pos + transp)), num);
+    return Cord(stod(data.substr(0, pos)), stod(data.substr(pos + transp)));
 }
 
 int main()
