@@ -78,9 +78,10 @@ int main()
             if (check_perm(permutations))
             {
                 buf = cost_perm(permutations, cords);
+                if (buf > result)
+                    result = buf;
             }
         } while (next_permutation(permutations.begin(), permutations.end()));
-
 
         fout << x << ":" << result << endl;      
     }
