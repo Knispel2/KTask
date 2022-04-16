@@ -23,6 +23,9 @@ private:
     vector <double> min_line;
     vector <double> min_column;
     int ribe_counter = 0;
+    vector <bool> black_line;
+    vector <bool> black_column;
+    double all_cost = 0;
 public:
     
     bool is_finish()
@@ -33,6 +36,11 @@ public:
             return false;
     }
     
+    double return_cost()
+    {
+        return all_cost;
+    }
+
     TSP_Graph(vector <Cord> cords)
     { //за бесконечность положим -1
         base.resize(cords.size(), vector<double>(cords.size(), -1));
@@ -42,13 +50,18 @@ public:
                     base[k][i] = dist(cords[k], cords[i]);
         min_line.resize(cords.size(), -1);
         min_column.resize(cords.size(), -1);
+        black_line.resize(cords.size(), false);
+        black_column.resize(cords.size(), false);
         base_buf = base;
     }
+
     void line_reduction()
     {
         double counter;
         for (int i = 0; i < base.size(); i++)
         {
+            if (black_line[i])
+                continue;
             counter = -1;
             for (int k = 0; k < base.size(); k++)
                 if ((i != k) and ((counter == -1) or (base[i][k] < counter)))
@@ -65,6 +78,8 @@ public:
         double counter;
         for (int i = 0; i < base.size(); i++)
         {
+            if (black_column[i])
+                continue;
             counter = -1;
             for (int k = 0; k < base.size(); k++)
                 if ((i != k) and ((counter == -1) or (base[k][i] < counter)))
@@ -76,7 +91,7 @@ public:
         }
     }
 
-    double get_ribe_cost()
+    void get_ribe_cost()
     {
         double counter = 0;
         double cost_ribe;
@@ -86,13 +101,36 @@ public:
                 if (base[i][k] == 0)
                     if (min_line[i] + min_column[k] > counter)
                     {
-                        buf = make_pair(i, k)
+                        buf = make_pair(i, k);
                         cost_ribe = base_buf[i][k];
-                    }
-                        
+                    }                        
         ribe_counter++;
         base[buf.first][buf.second] = -1;
-        return cost_ribe;
+        base[buf.second][buf.first] = -1;
+        all_cost += cost_ribe;
+    }
+
+    void matrix_reduction()
+    {
+        int counter;
+        for (int i = 0; i < base.size(); i++)
+        {
+            counter = 0;
+            for (int k = 0; k < base.size(); k++)
+                if (base[i][k] == -1) counter++;
+            if (counter > 2)
+                black_line[i] = true;
+        }
+
+        for (int i = 0; i < base.size(); i++)
+        {
+            counter = 0;
+            for (int k = 0; k < base.size(); k++)
+                if (base[k][i] == -1) counter++;
+            if (counter > 2)
+                black_column[i] = true;
+        }
+            
     }
 
 };
@@ -119,7 +157,6 @@ Cord split(string & data, string file_debug = "")
     return Cord(stod(data.substr(0, pos)), stod(data.substr(pos + transp)));
 }
 
-}
 
 int main()
 {
@@ -161,6 +198,7 @@ double cost_perm(vector <unsigned int>& permutations, vector <Cord>& cords)
     for (int i = 0; i < permutations.size(); i++)
         result += dist(cords[i + 1], cords[permutations[i] - 1]);
     return result;
+}
 
 double brutforce_method(vector <Cord> cords, double result)
 {
