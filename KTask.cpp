@@ -15,6 +15,88 @@ public:
     friend double dist(Cord a, Cord b);
 };
 
+class TSP_Graph
+{
+private:
+    vector < vector < double >> base;
+    vector < vector < double >> base_buf;
+    vector <double> min_line;
+    vector <double> min_column;
+    int ribe_counter = 0;
+public:
+    
+    bool is_finish()
+    {
+        if (ribe_counter == base.size())
+            return true;
+        else
+            return false;
+    }
+    
+    TSP_Graph(vector <Cord> cords)
+    { //за бесконечность положим -1
+        base.resize(cords.size(), vector<double>(cords.size(), -1));
+        for (int i = 0; i < cords.size(); i++)
+            for (int k = 0; k < cords.size(); k++)
+                if (i != k)
+                    base[k][i] = dist(cords[k], cords[i]);
+        min_line.resize(cords.size(), -1);
+        min_column.resize(cords.size(), -1);
+        base_buf = base;
+    }
+    void line_reduction()
+    {
+        double counter;
+        for (int i = 0; i < base.size(); i++)
+        {
+            counter = -1;
+            for (int k = 0; k < base.size(); k++)
+                if ((i != k) and ((counter == -1) or (base[i][k] < counter)))
+                    counter = base[i][k];
+            min_line[i] = counter;
+            for (int k = 0; k < base.size(); k++)
+                if (i != k)
+                    base[i][k] -= counter;
+        }            
+    }
+
+    void column_reduction()
+    {
+        double counter;
+        for (int i = 0; i < base.size(); i++)
+        {
+            counter = -1;
+            for (int k = 0; k < base.size(); k++)
+                if ((i != k) and ((counter == -1) or (base[k][i] < counter)))
+                    counter = base[k][i];
+            min_column[i] = counter;
+            for (int k = 0; k < base.size(); k++)
+                if (i != k)
+                    base[k][i] -= counter;
+        }
+    }
+
+    double get_ribe_cost()
+    {
+        double counter = 0;
+        double cost_ribe;
+        pair <int, int> buf;
+        for (int i = 0; i < base.size(); i++)
+            for (int k = 0; k < base.size(); k++)
+                if (base[i][k] == 0)
+                    if (min_line[i] + min_column[k] > counter)
+                    {
+                        buf = make_pair(i, k)
+                        cost_ribe = base_buf[i][k];
+                    }
+                        
+        ribe_counter++;
+        base[buf.first][buf.second] = -1;
+        return cost_ribe;
+    }
+
+};
+
 double dist(Cord a, Cord b)
 {
     return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
