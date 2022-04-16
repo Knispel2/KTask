@@ -171,15 +171,21 @@ int main()
         vector <Cord> cords;
         ifstream file("data/" + x);
         getline(file, buf);
-        double result = -1;
         while (getline(file, buf))
         {
             if (buf == "") continue;
             cords.push_back(split(buf, x));
         }
         file.close();
-
-        fout << x << ":" << result << endl;      
+        TSP_Graph test(cords);
+        while (!test.is_finish())
+        {
+            test.line_reduction();
+            test.column_reduction();
+            test.get_ribe_cost();
+            test.matrix_reduction();
+        }
+        fout << x << ":" << test.return_cost() << endl;      
     }
     fout.close();
 }
