@@ -37,19 +37,6 @@ Cord split(string & data, string file_debug = "")
     return Cord(stod(data.substr(0, pos)), stod(data.substr(pos + transp)));
 }
 
-bool check_perm(vector <unsigned int> & base)
-{
-    for (int i = 0; i < base.size(); i++)
-        if (base[base[i] - 1] == i + 1) return false;
-    return true;
-}
-
-double cost_perm(vector <unsigned int>& permutations, vector <Cord>& cords)
-{
-    double result = 0;
-    for (int i = 0; i < permutations.size(); i++)
-        result += dist(cords[i+1], cords[permutations[i]-1]);
-    return result;
 }
 
 int main()
@@ -58,8 +45,10 @@ int main()
     string buf;
     ofstream fout;
     fout.open("result.txt");
-    for (string x : data)
+    string x;
+    for (int k = 0; k < data.size(); k++)
     {
+        x = data[k];
         vector <Cord> cords;
         ifstream file("data/" + x);
         getline(file, buf);
@@ -70,20 +59,39 @@ int main()
             cords.push_back(split(buf, x));
         }
         file.close();
-        vector <unsigned int> permutations(cords.size());
-        for (int i = 0; i < cords.size(); i++)
-            permutations[0] = i + 1;
-        double buf;
-        do {
-            if (check_perm(permutations))
-            {
-                buf = cost_perm(permutations, cords);
-                if (buf > result)
-                    result = buf;
-            }
-        } while (next_permutation(permutations.begin(), permutations.end()));
 
         fout << x << ":" << result << endl;      
     }
     fout.close();
+}
+
+
+bool check_perm(const vector <unsigned int>& base)
+{
+    for (int i = 0; i < base.size(); i++)
+        if (base[base[i] - 1] == i + 1) return false;
+    return true;
+}
+
+double cost_perm(vector <unsigned int>& permutations, vector <Cord>& cords)
+{
+    double result = 0;
+    for (int i = 0; i < permutations.size(); i++)
+        result += dist(cords[i + 1], cords[permutations[i] - 1]);
+    return result;
+
+double brutforce_method(vector <Cord> cords, double result)
+{
+    vector <unsigned int> permutations(cords.size());
+    for (int i = 0; i < cords.size(); i++)
+        permutations[i] = i + 1;
+    double buf;
+    do {
+        if (check_perm(permutations))
+        {
+            buf = cost_perm(permutations, cords);
+            if (buf > result)
+                result = buf;
+        }
+    } while (next_permutation(permutations.begin(), permutations.end()));
 }
