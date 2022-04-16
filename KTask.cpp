@@ -64,11 +64,11 @@ public:
                 continue;
             counter = -1;
             for (int k = 0; k < base.size(); k++)
-                if ((i != k) and ((counter == -1) or (base[i][k] < counter)))
+                if ((i != k) and (base[i][k] >= 0) and ((counter == -1) or (base[i][k] < counter)))
                     counter = base[i][k];
             min_line[i] = counter;
             for (int k = 0; k < base.size(); k++)
-                if (i != k)
+                if ((i != k) and (base[i][k] > 0))
                     base[i][k] -= counter;
         }            
     }
@@ -82,24 +82,40 @@ public:
                 continue;
             counter = -1;
             for (int k = 0; k < base.size(); k++)
-                if ((i != k) and ((counter == -1) or (base[k][i] < counter)))
+                if ((i != k) and (base[k][i] >= 0)  and ((counter == -1) or (base[k][i] < counter)))
                     counter = base[k][i];
             min_column[i] = counter;
             for (int k = 0; k < base.size(); k++)
-                if (i != k)
+                if ((i != k) and (base[k][i] > 0))
                     base[k][i] -= counter;
         }
     }
 
+    double get_min(int i, int k)
+    {
+        double result = 0;
+        double local_min = -1;
+        for (int p = 0; p < base.size(); p++)
+            if (((local_min == -1) or (local_min > base[i][p])) and (base[i][p] >= 0) and (p != k))
+                local_min = base[i][p];
+        result += local_min;
+        local_min = -1;
+        for (int p = 0; p < base.size(); p++)
+            if (((local_min == -1) or (local_min > base[p][k])) and (base[p][k] >= 0) and (p != i))
+                local_min = base[i][p];
+        result += local_min;
+        return result;
+    }
+    
     void get_ribe_cost()
     {
         double counter = 0;
-        double cost_ribe;
+        double cost_ribe = 0;
         pair <int, int> buf;
         for (int i = 0; i < base.size(); i++)
             for (int k = 0; k < base.size(); k++)
                 if (base[i][k] == 0)
-                    if (min_line[i] + min_column[k] > counter)
+                    if (get_min(i, k) > counter)
                     {
                         buf = make_pair(i, k);
                         cost_ribe = base_buf[i][k];
@@ -119,7 +135,12 @@ public:
             for (int k = 0; k < base.size(); k++)
                 if (base[i][k] == -1) counter++;
             if (counter > 2)
+            {
                 black_line[i] = true;
+                for (int k = 0; k < base.size(); k++)
+                    base[i][k] = -2;
+            }
+                
         }
 
         for (int i = 0; i < base.size(); i++)
@@ -128,7 +149,11 @@ public:
             for (int k = 0; k < base.size(); k++)
                 if (base[k][i] == -1) counter++;
             if (counter > 2)
+            {
                 black_column[i] = true;
+                for (int k = 0; k < base.size(); k++)
+                    base[k][i] = -2;
+            }
         }
             
     }
@@ -220,4 +245,5 @@ double brutforce_method(vector <Cord> cords, double result)
                 result = buf;
         }
     } while (next_permutation(permutations.begin(), permutations.end()));
+    return buf;
 }
