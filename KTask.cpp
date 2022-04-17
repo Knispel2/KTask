@@ -6,15 +6,22 @@
 #include <exception>
 using namespace std;
 
+
+
 class Cord
 {
 private:
     double x, y;
-public:    
+public:     
     Cord(double a, double b) : x(a), y(b)
     {}
     friend double dist(Cord a, Cord b);
 };
+
+double dist(Cord a, Cord b)
+{
+    return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
+}
 
 class TSP_Graph
 {
@@ -166,10 +173,7 @@ public:
 
 };
 
-double dist(Cord &a, Cord &b)
-{
-    return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
-}
+
 
 vector <string> list_files(string dir)
 {
@@ -211,12 +215,15 @@ int main()
             }
             file.close();
             TSP_Graph test(cords);
+            int count = 0;
             while (!test.is_finish())
             {
                 test.line_reduction();
                 test.column_reduction();
                 test.get_ribe_cost();
                 test.matrix_reduction();
+                count++;
+                cout << count << " ribe ended." << endl;
             }
             cout << x << " test finished " << endl;
             fout << x << ":" << test.return_cost() << endl;
