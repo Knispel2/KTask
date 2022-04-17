@@ -2,7 +2,7 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
-#include <algorithm>
+#include <cmath>
 using namespace std;
 
 class Cord
@@ -41,7 +41,7 @@ public:
         return all_cost;
     }
 
-    TSP_Graph(vector <Cord> cords)
+    TSP_Graph(vector <Cord> & cords)
     { //за бесконечность положим -1
         base.resize(cords.size(), vector<double>(cords.size(), -1));
         for (int i = 0; i < cords.size(); i++)
@@ -193,6 +193,7 @@ int main()
     for (int k = 0; k < data.size(); k++)
     {
         x = data[k];
+        cout << "Starting " << x << endl << flush;
         vector <Cord> cords;
         ifstream file("data/" + x);
         getline(file, buf);
@@ -210,7 +211,9 @@ int main()
             test.get_ribe_cost();
             test.matrix_reduction();
         }
-        fout << x << ":" << test.return_cost() << endl;      
+        cout << x << " test finished " << endl;
+        fout << x << ":" << test.return_cost() << endl;    
+        test.~TSP_Graph();
     }
     fout.close();
 }
