@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <cmath>
+#include <exception>
 using namespace std;
 
 class Cord
@@ -133,34 +134,39 @@ public:
         {
             counter = 0;
             for (int k = 0; k < base.size(); k++)
-                if (base[i][k] == -1) counter++;
-            if (counter > 2)
             {
-                black_line[i] = true;
-                for (int k = 0; k < base.size(); k++)
-                    base[i][k] = -2;
-            }
-                
+                if (base[i][k] == -1) counter++;
+                if (counter >= 2)
+                {
+                    black_line[i] = true;
+                    for (int k = 0; k < base.size(); k++)
+                        base[i][k] = -2;
+                    break;
+                }                
+            }                
         }
 
         for (int i = 0; i < base.size(); i++)
         {
             counter = 0;
             for (int k = 0; k < base.size(); k++)
-                if (base[k][i] == -1) counter++;
-            if (counter > 2)
             {
-                black_column[i] = true;
-                for (int k = 0; k < base.size(); k++)
-                    base[k][i] = -2;
-            }
+                if (base[k][i] == -1) counter++;
+                if (counter >= 2)
+                {
+                    black_column[i] = true;
+                    for (int k = 0; k < base.size(); k++)
+                        base[k][i] = -2;
+                    break;
+                }
+            }           
         }
             
     }
 
 };
 
-double dist(Cord a, Cord b)
+double dist(Cord &a, Cord &b)
 {
     return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 }
@@ -190,30 +196,37 @@ int main()
     ofstream fout;
     fout.open("result.txt");
     string x;
-    for (int k = 0; k < data.size(); k++)
+    try {
+        for (int k = 0; k < data.size(); k++)
+        {
+            x = data[k];
+            cout << "Starting " << x << endl << flush;
+            vector <Cord> cords;
+            ifstream file("data/" + x);
+            getline(file, buf);
+            while (getline(file, buf))
+            {
+                if (buf == "") continue;
+                cords.push_back(split(buf, x));
+            }
+            file.close();
+            TSP_Graph test(cords);
+            while (!test.is_finish())
+            {
+                test.line_reduction();
+                test.column_reduction();
+                test.get_ribe_cost();
+                test.matrix_reduction();
+            }
+            cout << x << " test finished " << endl;
+            fout << x << ":" << test.return_cost() << endl;
+            test.~TSP_Graph();
+        }
+    }
+    catch (exception& e)
     {
-        x = data[k];
-        cout << "Starting " << x << endl << flush;
-        vector <Cord> cords;
-        ifstream file("data/" + x);
-        getline(file, buf);
-        while (getline(file, buf))
-        {
-            if (buf == "") continue;
-            cords.push_back(split(buf, x));
-        }
-        file.close();
-        TSP_Graph test(cords);
-        while (!test.is_finish())
-        {
-            test.line_reduction();
-            test.column_reduction();
-            test.get_ribe_cost();
-            test.matrix_reduction();
-        }
-        cout << x << " test finished " << endl;
-        fout << x << ":" << test.return_cost() << endl;    
-        test.~TSP_Graph();
+        cout << e.what();
+        cin.get();
     }
     fout.close();
 }
