@@ -223,7 +223,7 @@ int main()
                 test.get_ribe_cost();
                 test.matrix_reduction();
                 count++;
-                cout << count << " ribe ended." << endl;
+                cout << count << " edge ended." << flush << endl;
             }
             cout << x << " test finished " << endl;
             fout << x << ":" << test.return_cost() << endl;
