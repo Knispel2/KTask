@@ -227,7 +227,6 @@ int main()
             }
             cout << x << " test finished " << endl;
             fout << x << ":" << test.return_cost() << endl;
-            test.~TSP_Graph();
         }
     }
     catch (exception& e)
